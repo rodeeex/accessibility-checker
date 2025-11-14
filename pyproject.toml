@@ -1,0 +1,17 @@
+[project]
+name = "Accessibility Checker"
+version = "0.1.0"
+authors = [
+    { name = "Anton Pushkarev" },
+    { name = "Bogdan Nekrasov" }
+]
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+
+dependencies = [
+    "playwright==1.42.0",
+    "beautifulsoup4==4.12.3",
+    "playwright-stealth",
+    "lxml==5.2.1",
+    "weasyprint==61.2",
+]
