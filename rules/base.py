@@ -20,7 +20,7 @@ class Issue:
 
 class WCAGRule(ABC):
     """
-    Абстрактный класс для правил WCAG (метод check реализовывается в наследниках)
+    Абстрактный класс для правил WCAG
     """
     name: str = ""
     criterion: str = ""
@@ -47,7 +47,7 @@ class WCAGRule(ABC):
         Проверить страницу по всем зарегистрированным правилам
 
         :param html: HTML-контент страницы
-        :return: Список всех найденных нарушений
+        :return: список всех найденных нарушений
         """
         all_issues = []
         rules = cls.get_all_rules()
@@ -65,7 +65,7 @@ class WCAGRule(ABC):
     @abstractmethod
     def check(self, html: str) -> List[Issue]:
         """
-        Проверить HTML-страницу на соответствие правилу
+        Проверить HTML-страницу на соответствие ОДНОМУ правилу (данный метод реализуется в наследниках)
 
         :param html: HTML-контент страницы
         :return: список найденных нарушений
@@ -74,7 +74,7 @@ class WCAGRule(ABC):
 
     def _parse(self, html: str) -> BeautifulSoup:
         """
-        Парсинг HTML-контента
+        Спарсить HTML-контент
 
         :param html: HTML-контент
         """
@@ -82,7 +82,7 @@ class WCAGRule(ABC):
 
     def _get_line(self, html: str, element_str: str) -> int:
         """
-        Определение номера строки элемента в исходном HTML-коде
+        Определить номера строки элемента в исходном HTML-коде
 
         :param html: HTML-контент
         :param element_str: строковое представление элемента
@@ -98,10 +98,10 @@ class WCAGRule(ABC):
         Создать объект Issue для найденного нарушения
 
         :param element: HTML-элемент
-        :param message: Сообщение о нарушении
-        :param recommendation: Рекомендация по исправлению
-        :param html: Исходный HTML для определения строки
-        :return: Объект Issue
+        :param message: сообщение о нарушении
+        :param recommendation: рекомендация по исправлению
+        :param html: исходный HTML для определения строки
+        :return: объект Issue
         """
         element_str = str(element)
         return Issue(
