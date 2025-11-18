@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Чекер доступности веб-сайтов
 CLI инструмент для проверки доступности веб-страниц с использованием Playwright
@@ -28,10 +27,10 @@ def parse_arguments():
         description='Чекер доступности веб-сайтов',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
-Примеры использования:
-  python main.py https://example.com
-  python main.py https://example.com --report json --timeout 30
-  python main.py https://example.com --report pdf --timeout 60
+        Примеры использования:
+          python main.py https://example.com
+          python main.py https://example.com --report json --timeout 30
+          python main.py https://example.com --report pdf --timeout 60
         '''
     )
 

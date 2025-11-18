@@ -3,7 +3,7 @@ from .base import WCAGRule, Issue
 
 
 class ImageAltTextRule(WCAGRule):
-    name = "Image Alt Text"
+    name = "Non-text Content"
     criterion = "1.1.1"
     level = "A"
 
