@@ -32,6 +32,8 @@ def parse_arguments():
   python main.py https://example.com
   python main.py https://example.com --report json --timeout 30
   python main.py https://example.com --report pdf --timeout 60
+  python main.py https://example.com --report json --filename report.json
+  python main.py https://example.com --report html --filename accessibility_report.html
         '''
     )
 
@@ -58,6 +60,14 @@ def parse_arguments():
         help='Таймаут в секундах (по умолчанию: 30)'
     )
 
+    # Аргумент для имени файла отчета
+    parser.add_argument(
+        '--filename',
+        type=str,
+        metavar='FILE',
+        help='Имя файла для сохранения отчета (используется с форматами json, pdf, html)'
+    )
+
     return parser.parse_args()
 
 
@@ -77,10 +87,16 @@ def main():
             print(f"Ошибка: Таймаут должен быть положительным числом, получено: {args.timeout}", file=sys.stderr)
             sys.exit(1)
 
+        # Валидация filename
+        if args.filename and args.report == 'console':
+            print("Предупреждение: Аргумент --filename игнорируется при формате отчета 'console'", file=sys.stderr)
+
         # Вывод параметров для проверки
         print(f"URL для проверки: {args.url}")
         print(f"Формат отчета: {args.report}")
         print(f"Таймаут: {args.timeout} секунд")
+        if args.filename and args.report != 'console':
+            print(f"Файл отчета: {args.filename}")
 
         # TODO: Здесь будет реализована логика проверки доступности с Playwright
         print("\nНачинаю проверку доступности...")
