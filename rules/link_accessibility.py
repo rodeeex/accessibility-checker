@@ -3,7 +3,7 @@ from .base import WCAGRule, Issue
 
 
 class LinkAccessibilityRule(WCAGRule):
-    name = "Link Purpose"
+    name = "Link Purpose (In Context)"
     criterion = "2.4.4"
     level = "A"
 
