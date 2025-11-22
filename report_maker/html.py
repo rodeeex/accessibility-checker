@@ -9,29 +9,23 @@ def generate_html_report(report_data: dict) -> str:
     :param report_data: Данные для отчета
     :return: HTML строка с отчетом
     """
-    # Получаем путь к шаблону
     template_dir = os.path.dirname(os.path.abspath(__file__))
     template_path = os.path.join(template_dir, "report_template.html")
 
-    # Настраиваем Jinja2 окружение
     env = Environment(
         loader=FileSystemLoader(template_dir),
         autoescape=select_autoescape(['html', 'xml'])
     )
 
-    # Загружаем шаблон
     template = env.get_template("report_template.html")
 
-    # Подготавливаем данные для шаблона
     template_data = _prepare_template_data(report_data)
 
-    # Рендерим шаблон
     return template.render(**template_data)
 
 
 def _prepare_template_data(report_data: dict) -> dict:
     """Подготавливает данные для шаблона"""
-    # Получаем сводку по уровням
     level_summary = _get_level_summary(report_data["issues"])
 
     return {

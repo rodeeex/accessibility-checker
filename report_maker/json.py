@@ -8,7 +8,6 @@ def generate_json_report(report_data: dict) -> str:
     :param report_data: Данные для отчета
     :return: JSON строка с отчетом
     """
-    # Создаем структуру JSON отчета
     json_report = {
         "report_info": {
             "url": report_data["url"],

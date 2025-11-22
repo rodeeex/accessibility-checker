@@ -1,6 +1,5 @@
-from colorama import Fore, Back, Style, init
+from colorama import Fore, Style, init
 
-# Инициализируем colorama для поддержки цветов в Windows
 init(autoreset=True)
 
 
@@ -13,18 +12,15 @@ def generate_console_report(report_data: dict) -> str:
     """
     lines = []
 
-    # Заголовок отчета
     lines.append("=" * 80)
     lines.append(f"{Fore.CYAN}{Style.BRIGHT}ОТЧЕТ О ПРОВЕРКЕ ДОСТУПНОСТИ")
     lines.append("=" * 80)
 
-    # Информация о проверке
     lines.append(f"URL: {Fore.BLUE}{report_data['url']}")
     lines.append(f"Время проверки: {report_data['timestamp']}")
     lines.append(f"Общее количество проблем: {Fore.RED}{report_data['total_issues']}")
     lines.append("")
 
-    # Сводка по уровням
     summary = _get_level_summary(report_data["issues"])
     lines.append(f"{Fore.YELLOW}{Style.BRIGHT}СВОДКА ПО УРОВНЯМ:")
     lines.append("-" * 30)
@@ -33,7 +29,6 @@ def generate_console_report(report_data: dict) -> str:
         lines.append(f"Уровень {color}{level}: {count} проблем(а)")
     lines.append("")
 
-    # Детали проблем
     if report_data["issues"]:
         lines.append(f"{Fore.YELLOW}{Style.BRIGHT}ДЕТАЛИ ПРОБЛЕМ:")
         lines.append("-" * 40)
@@ -46,7 +41,6 @@ def generate_console_report(report_data: dict) -> str:
             lines.append(f"   Уровень: {level_color}{group['level']}")
             lines.append(f"   Количество: {Fore.RED}{group['count']}")
 
-            # Показываем до 3 примеров для каждой группы
             for j, issue in enumerate(group["issues"][:3], 1):
                 lines.append(f"   {j}) Элемент: {Fore.MAGENTA}{issue['element']}")
                 lines.append(f"      Строка: {issue['line']}")
@@ -56,7 +50,7 @@ def generate_console_report(report_data: dict) -> str:
             if len(group["issues"]) > 3:
                 lines.append(f"   ... и еще {len(group['issues']) - 3} проблем(а)")
     else:
-        lines.append(f"{Fore.GREEN}{Style.BRIGHT}🎉 Проблемы доступности не найдены!")
+        lines.append(f"{Fore.GREEN}{Style.BRIGHT}Проблемы доступности не найдены!")
 
     lines.append("\n" + "=" * 80)
 
