@@ -34,7 +34,6 @@ def parse_arguments():
           python main.py https://example.com --report pdf --timeout 60
           python main.py https://example.com --report json --filename report.json
           python main.py https://example.com --report html --filename accessibility_report.html
-        >>>>>>> dev
         '''
     )
 
