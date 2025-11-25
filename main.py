@@ -6,6 +6,7 @@ CLI инструмент для проверки доступности веб-�
 import argparse
 import sys
 from urllib.parse import urlparse
+from report_maker import make_report, save_report_to_file, get_reports_directory
 
 
 def validate_url(url):
@@ -31,16 +32,17 @@ def parse_arguments():
           python main.py https://example.com
           python main.py https://example.com --report json --timeout 30
           python main.py https://example.com --report pdf --timeout 60
+          python main.py https://example.com --report json --filename report.json
+          python main.py https://example.com --report html --filename accessibility_report.html
+        >>>>>>> dev
         '''
     )
 
-    # Позиционный аргумент для URL
     parser.add_argument(
         'url',
         help='URL веб-сайта для проверки доступности'
     )
 
-    # Аргумент для формата отчета
     parser.add_argument(
         '--report',
         choices=['json', 'pdf', 'html', 'console'],
@@ -48,13 +50,19 @@ def parse_arguments():
         help='Формат вывода отчета (по умолчанию: console)'
     )
 
-    # Аргумент для таймаута
     parser.add_argument(
         '--timeout',
         type=int,
         default=30,
         metavar='N',
         help='Таймаут в секундах (по умолчанию: 30)'
+    )
+
+    parser.add_argument(
+        '--filename',
+        type=str,
+        metavar='FILE',
+        help='Имя файла для сохранения отчета (используется с форматами json, pdf, html)'
     )
 
     return parser.parse_args()
@@ -65,24 +73,53 @@ def main():
     try:
         args = parse_arguments()
 
-        # Валидация URL
         if not validate_url(args.url):
             print(f"Ошибка: Некорректный URL '{args.url}'", file=sys.stderr)
             print("URL должен начинаться с http:// или https://", file=sys.stderr)
             sys.exit(1)
 
-        # Валидация таймаута
         if args.timeout <= 0:
             print(f"Ошибка: Таймаут должен быть положительным числом, получено: {args.timeout}", file=sys.stderr)
             sys.exit(1)
 
-        # Вывод параметров для проверки
+        if args.filename and args.report == 'console':
+            print("Предупреждение: Аргумент --filename игнорируется при формате отчета 'console'", file=sys.stderr)
+
         print(f"URL для проверки: {args.url}")
         print(f"Формат отчета: {args.report}")
         print(f"Таймаут: {args.timeout} секунд")
+        if args.filename and args.report != 'console':
+            print(f"Файл отчета: {args.filename}")
 
         # TODO: Здесь будет реализована логика проверки доступности с Playwright
         print("\nНачинаю проверку доступности...")
+
+        # Заглушка - список найденных проблем (в будущем будет заменен на реальную проверку)
+        issues = []  # Пока пустой список, в будущем здесь будут реальные проблемы
+
+        # Обработка результатов
+        if args.report == 'console':
+            report_content = make_report(issues, args.url, 'console')
+            print(report_content)
+        else:
+            try:
+                if args.filename:
+                    file_path = save_report_to_file(
+                        issues, args.url, args.report,
+                        filename=args.filename
+                    )
+                else:
+                    reports_dir = get_reports_directory()
+                    file_path = save_report_to_file(
+                        issues, args.url, args.report,
+                        output_path=reports_dir
+                    )
+
+                print(f"\nОтчет сохранен: {file_path}")
+
+            except Exception as e:
+                print(f"\nОшибка при сохранении отчета: {e}", file=sys.stderr)
+                sys.exit(1)
 
     except KeyboardInterrupt:
         print("\nПроверка прервана пользователем", file=sys.stderr)

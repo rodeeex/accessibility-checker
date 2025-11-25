@@ -22,8 +22,8 @@ uv.lock
 # Reports
 *.json
 *.pdf
-*.html
-reports/
+
+
 
 # OS
 .DS_Store
