@@ -1,4 +1,6 @@
 import os
+import shutil
+from urllib.parse import urlparse
 from datetime import datetime
 from typing import Optional
 from .report import make_report
@@ -20,14 +22,11 @@ def save_report_to_file(issues, url: str, report_type: str,
     if report_type not in ['json', 'html', 'pdf']:
         raise ValueError("Сохранение поддерживается только для форматов: json, html, pdf")
 
-    # Определяем путь для сохранения
     if output_path is None:
         output_path = os.getcwd()
 
-    # Создаем директорию если её нет
     os.makedirs(output_path, exist_ok=True)
 
-    # Генерируем имя файла если не указано
     if filename is None:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         domain = _extract_domain(url)
@@ -38,7 +37,6 @@ def save_report_to_file(issues, url: str, report_type: str,
 
     if report_type == 'pdf':
         temp_pdf_path = make_report(issues, url, 'pdf')
-        import shutil
         shutil.move(temp_pdf_path, full_path)
     else:
         report_content = make_report(issues, url, report_type)
@@ -53,8 +51,6 @@ def save_report_to_file(issues, url: str, report_type: str,
 
 def _extract_domain(url: str) -> str:
     """Извлекает доменное имя из URL для использования в имени файла"""
-    from urllib.parse import urlparse
-
     try:
         parsed = urlparse(url)
         domain = parsed.netloc.lower()

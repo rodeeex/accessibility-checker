@@ -104,13 +104,11 @@ def main():
         else:
             try:
                 if args.filename:
-                    # Если указано имя файла, сохраняем в текущей директории
                     file_path = save_report_to_file(
                         issues, args.url, args.report,
                         filename=args.filename
                     )
                 else:
-                    # Если имя файла не указано, сохраняем в папку reports с автогенерацией имени
                     reports_dir = get_reports_directory()
                     file_path = save_report_to_file(
                         issues, args.url, args.report,

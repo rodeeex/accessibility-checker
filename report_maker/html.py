@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 
@@ -51,7 +52,6 @@ def _get_level_summary(grouped_issues: list) -> dict:
 
 def _format_timestamp(timestamp: str) -> str:
     """Форматирует временную метку для красивого отображения"""
-    from datetime import datetime
     try:
         dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
         return dt.strftime("%d.%m.%Y %H:%M:%S")
