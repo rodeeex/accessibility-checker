@@ -9,12 +9,18 @@ class LinkAccessibilityRule(WCAGRule):
 
     def check(self, html: str) -> List[Issue]:
         """
-        Проверить доступность ссылок
+        Проверить доступность ссылок (исключая якорные цели)
         """
         issues = []
         soup = self._parse(html)
 
         for link in soup.find_all('a'):
+            href = link.get('href', '').strip()
+
+            if not href or href == '#':
+                if link.has_attr('name') or link.has_attr('id'):
+                    continue
+
             if not link.has_attr('href'):
                 issues.append(self._issue(
                     link,
@@ -30,7 +36,7 @@ class LinkAccessibilityRule(WCAGRule):
 
             if not link_text and not aria_label and not title:
                 img = link.find('img')
-                if img and img.has_attr('alt') and img['alt'].strip():
+                if img and img.get('alt', '').strip():
                     continue
 
                 issues.append(self._issue(
@@ -39,6 +45,20 @@ class LinkAccessibilityRule(WCAGRule):
                     'Добавьте текст, aria-label или alt к изображению внутри ссылки',
                     html
                 ))
+
+        for elem in soup.find_all(attrs={'role': 'button'}):
+            if elem.name == 'button':
                 continue
+
+            elem_text = elem.get_text(strip=True)
+            aria_label = elem.get('aria-label', '').strip()
+
+            if not elem_text and not aria_label:
+                issues.append(self._issue(
+                    elem,
+                    f'Элемент <{elem.name}> с role="button" не имеет доступного имени',
+                    'Добавьте текст или aria-label для описания действия',
+                    html
+                ))
 
         return issues

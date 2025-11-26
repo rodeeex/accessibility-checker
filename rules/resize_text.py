@@ -1,4 +1,4 @@
-from rules import WCAGRule, Issue
+from .base import WCAGRule, Issue
 from typing import List
 
 

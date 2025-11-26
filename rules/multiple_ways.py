@@ -9,29 +9,32 @@ class MultipleWaysRule(WCAGRule):
 
     def check(self, html: str) -> List[Issue]:
         """
-        Проверить наличие поисковой формы на странице
+        Проверить наличие нескольких способов навигации (поиск, навигация, карта сайта)
         """
         issues = []
         soup = self._parse(html)
 
-        search_role = soup.find(attrs={'role': 'search'})
-        search_input = soup.find('input', attrs={'type': 'search'})
+        has_search = bool(
+            soup.find(attrs={'role': 'search'}) or
+            soup.find('input', attrs={'type': 'search'}) or
+            soup.find('form', class_=lambda c: c and 'search' in str(c).lower())
+        )
 
-        search_form = soup.find('form', attrs={
-            'class': lambda c: c and 'search' in str(c).lower(),
-        }) or soup.find('form', attrs={
-            'id': lambda i: i and 'search' in str(i).lower(),
-        })
+        nav_links = soup.find_all('nav')
+        list_navs = soup.find_all(['ul', 'ol'], class_=lambda c: c and 'nav' in str(c).lower())
+        total_nav_links = len(nav_links) + len(list_navs)
 
-        if not search_role and not search_input and not search_form:
+        has_sitemap = bool(soup.find('a', href=lambda h: h and 'sitemap' in h.lower()))
+
+        if not has_search and total_nav_links == 0 and not has_sitemap:
             issues.append(Issue(
                 name=self.name,
                 criterion=self.criterion,
                 level=self.level,
-                element='search',
-                line=0,
-                message='На странице отсутствует функция поиска',
-                recommendation='Добавьте поисковую форму с role="search" или input type="search"'
+                element='navigation',
+                line=1,
+                message='На странице отсутствуют альтернативные способы навигации',
+                recommendation='Добавьте поиск, навигационное меню или ссылку на карту сайта'
             ))
 
         return issues

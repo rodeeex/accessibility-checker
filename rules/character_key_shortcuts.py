@@ -1,3 +1,4 @@
+import re
 from typing import List
 from .base import WCAGRule, Issue
 
@@ -5,6 +6,15 @@ class CharacterKeyShortcutsRule(WCAGRule):
     name: str = "Character Key Shortcuts"
     criterion: str = "2.1.4"
     level: str = "A"
+
+    def _has_single_character_shortcut(self, script: str) -> bool:
+        """
+        Упрощённая проверка одиночных символов в обработчиках
+        В реальном инструменте нужен JS-парсер
+        """
+        script_lower = script.lower()
+
+        return any(len(s.strip()) == 1 for s in re.findall(r"['\"]([a-z0-9])['\"]", script_lower))
 
     def check(self, html: str) -> List[Issue]:
         """

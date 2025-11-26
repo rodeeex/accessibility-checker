@@ -6,10 +6,12 @@ CLI инструмент для проверки доступности веб-�
 import argparse
 import sys
 from urllib.parse import urlparse
+from browser.fetcher import fetch_page
 from report_maker import make_report, save_report_to_file, get_reports_directory
+from rules import WCAGRule
 
 
-def validate_url(url):
+def validate_url(url: str) -> bool:
     """Валидация URL"""
     try:
         result = urlparse(url)
@@ -84,47 +86,63 @@ def main():
         if args.filename and args.report == 'console':
             print("Предупреждение: Аргумент --filename игнорируется при формате отчета 'console'", file=sys.stderr)
 
-        print(f"URL для проверки: {args.url}")
-        print(f"Формат отчета: {args.report}")
-        print(f"Таймаут: {args.timeout} секунд")
-        if args.filename and args.report != 'console':
-            print(f"Файл отчета: {args.filename}")
+        print(f"\nПроверка: {args.url}")
+        print(f"Формат: {args.report} | Таймаут: {args.timeout}s\n")
 
-        # TODO: Здесь будет реализована логика проверки доступности с Playwright
-        print("\nНачинаю проверку доступности...")
+        # Загрузка страницы
+        try:
+            page_data = fetch_page(args.url, args.timeout)
+            print(f"✓ Загружено: {page_data['title']} ({page_data['status']})")
+            print(f"DEBUG\n\n{page_data['html']}\n")
+        except Exception as e:
+            print(f"✗ Ошибка загрузки: {e}", file=sys.stderr)
+            sys.exit(1)
 
-        # Заглушка - список найденных проблем (в будущем будет заменен на реальную проверку)
-        issues = []  # Пока пустой список, в будущем здесь будут реальные проблемы
+        # Проверка правил WCAG
+        try:
+            issues = WCAGRule.run_all(page_data['html'])
+            print(f"✓ Найдено проблем: {len(issues)}\n")
+        except Exception as e:
+            print(f"✗ Ошибка проверки: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
 
-        # Обработка результатов
-        if args.report == 'console':
-            report_content = make_report(issues, args.url, 'console')
-            print(report_content)
-        else:
-            try:
+        # Генерация отчёта
+        try:
+            if args.report == 'console':
+                report_content = make_report(issues, page_data['url'], 'console')
+                print(report_content)
+            else:
                 if args.filename:
                     file_path = save_report_to_file(
-                        issues, args.url, args.report,
+                        issues, page_data['url'], args.report,
                         filename=args.filename
                     )
                 else:
                     reports_dir = get_reports_directory()
                     file_path = save_report_to_file(
-                        issues, args.url, args.report,
+                        issues, page_data['url'], args.report,
                         output_path=reports_dir
                     )
 
-                print(f"\nОтчет сохранен: {file_path}")
+                print(f"✓ Отчёт сохранён: {file_path}\n")
 
-            except Exception as e:
-                print(f"\nОшибка при сохранении отчета: {e}", file=sys.stderr)
-                sys.exit(1)
+        except Exception as e:
+            print(f"✗ Ошибка при создании отчёта: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
+            sys.exit(1)
+
+        sys.exit(0 if len(issues) == 0 else 1)
 
     except KeyboardInterrupt:
-        print("\nПроверка прервана пользователем", file=sys.stderr)
-        sys.exit(1)
+        print("\n\n⚠ Проверка прервана пользователем", file=sys.stderr)
+        sys.exit(130)
     except Exception as e:
-        print(f"Ошибка: {e}", file=sys.stderr)
+        print(f"\n✗ Неожиданная ошибка: {e}", file=sys.stderr)
+        import traceback
+        traceback.print_exc()
         sys.exit(1)
 
 

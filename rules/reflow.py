@@ -1,5 +1,5 @@
 from typing import List
-from rules import WCAGRule, Issue
+from .base import WCAGRule, Issue
 
 
 class ReflowRule(WCAGRule):

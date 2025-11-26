@@ -6,6 +6,29 @@ class LabelsOrInstructionsRule(WCAGRule):
     criterion: str = "3.3.2"
     level: str = "A"
 
+    def _has_label(self, element, soup) -> bool:
+        """Проверить, имеет ли поле ввода связанную метку"""
+        element_id = element.get('id')
+
+        if element_id:
+            if soup.find('label', attrs={'for': element_id}):
+                return True
+
+        parent = element.parent
+        if parent and parent.name == 'label':
+            return True
+
+        if element.get('aria-label') or element.get('aria-labelledby'):
+            return True
+
+        if element.get('title'):
+            return True
+
+        if element.get('placeholder') and element.name == 'input':
+            return True
+
+        return False
+
     def check(self, html: str) -> List[Issue]:
         """
         Проверяет поля формы на наличие меток или инструкций.

@@ -1,5 +1,5 @@
-from rules import WCAGRule, Issue
 from typing import List
+from .base import WCAGRule, Issue
 
 
 class FocusVisibleRule(WCAGRule):
@@ -9,7 +9,7 @@ class FocusVisibleRule(WCAGRule):
 
     def check(self, html: str) -> List[Issue]:
         """
-        Проверяет отключение видимого фокуса без альтернативы.
+        Проверяет отключение видимого фокуса
         """
         issues = []
         soup = self._parse(html)
@@ -21,7 +21,7 @@ class FocusVisibleRule(WCAGRule):
                 issues.append(self._issue(
                     elem,
                     "Элемент отключает видимый фокус (outline:none)",
-                    "Не скрывайте outline без предоставления видимого фокусного состояния",
+                    "Не скрывайте outline без предоставления альтернативного видимого фокуса",
                     html
                 ))
 

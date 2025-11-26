@@ -22,8 +22,7 @@ uv.lock
 # Reports
 *.json
 *.pdf
-
-
+accessibility_reports
 
 # OS
 .DS_Store
