@@ -1,1 +1,1 @@
-pyinstaller --onefile accessibility-checker/main.py
+pyinstaller --onefile main.py
