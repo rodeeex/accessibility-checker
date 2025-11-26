@@ -10,7 +10,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -21,15 +22,16 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install pyinstaller
+        if exist requirements.txt pip install -r requirements.txt
 
     - name: Build executable
       run: pyinstaller --onefile main.py
 
-    - name: Upload executable
+    - name: Show dist folder contents
+      run: dir dist
+
+    - name: Upload executable artifact
       uses: actions/upload-artifact@v4
       with:
         name: python-executable
-        path: dist\accessibility-checker.exe
-
-    - name: Show dist contents
-      run: dir dist
+        path: dist\main.exe
