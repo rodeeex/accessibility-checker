@@ -33,7 +33,6 @@ def parse_arguments():
         Примеры использования:
           python main.py https://example.com
           python main.py https://example.com --report json --timeout 30
-          python main.py https://example.com --report pdf --timeout 60
           python main.py https://example.com --report json --filename report.json
           python main.py https://example.com --report html --filename accessibility_report.html
         '''
@@ -46,7 +45,7 @@ def parse_arguments():
 
     parser.add_argument(
         '--report',
-        choices=['json', 'pdf', 'html', 'console'],
+        choices=['json', 'html', 'console'],
         default='console',
         help='Формат вывода отчета (по умолчанию: console)'
     )
@@ -63,7 +62,7 @@ def parse_arguments():
         '--filename',
         type=str,
         metavar='FILE',
-        help='Имя файла для сохранения отчета (используется с форматами json, pdf, html)'
+        help='Имя файла для сохранения отчета (используется с форматами json, html)'
     )
 
     return parser.parse_args()

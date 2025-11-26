@@ -9,7 +9,7 @@ def make_report(issues: List[Issue], url: str, report_type: str = 'console') -> 
 
     :param issues: Список найденных нарушений
     :param url: URL проверенной страницы
-    :param report_type: Тип отчета ('console', 'json', 'html', 'pdf')
+    :param report_type: Тип отчета ('console', 'json', 'html')
     :return: Сгенерированный отчет в виде строки (для pdf - путь к файлу)
     """
     grouped_issues = _group_and_sort_issues(issues)
@@ -30,9 +30,6 @@ def make_report(issues: List[Issue], url: str, report_type: str = 'console') -> 
     elif report_type == 'html':
         from .html import generate_html_report
         return generate_html_report(report_data)
-    elif report_type == 'pdf':
-        from .pdf import generate_pdf_report
-        return generate_pdf_report(report_data)
     else:
         raise ValueError(f"Неподдерживаемый тип отчета: {report_type}")
 
