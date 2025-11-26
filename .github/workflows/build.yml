@@ -29,4 +29,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: python-executable
-        path: dist\accessibility-checker.exe
+        path: accessibility-checker.exe
