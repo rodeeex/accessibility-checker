@@ -1,5 +1,4 @@
 import os
-import shutil
 from urllib.parse import urlparse
 from datetime import datetime
 from typing import Optional
@@ -14,13 +13,13 @@ def save_report_to_file(issues, url: str, report_type: str,
 
     :param issues: Список найденных нарушений
     :param url: URL проверенной страницы
-    :param report_type: Тип отчета ('json', 'html', 'pdf')
+    :param report_type: Тип отчета ('json', 'html')
     :param output_path: Путь для сохранения (по умолчанию текущая директория)
     :param filename: Имя файла (автогенерируется если не указано)
     :return: Полный путь к сохраненному файлу
     """
-    if report_type not in ['json', 'html', 'pdf']:
-        raise ValueError("Сохранение поддерживается только для форматов: json, html, pdf")
+    if report_type not in ['json', 'html']:
+        raise ValueError("Сохранение поддерживается только для форматов: json, html")
 
     if output_path is None:
         output_path = os.getcwd()
@@ -35,15 +34,11 @@ def save_report_to_file(issues, url: str, report_type: str,
     full_path = os.path.join(output_path, filename)
 
 
-    if report_type == 'pdf':
-        temp_pdf_path = make_report(issues, url, 'pdf')
-        shutil.move(temp_pdf_path, full_path)
-    else:
-        report_content = make_report(issues, url, report_type)
+    report_content = make_report(issues, url, report_type)
 
-        encoding = 'utf-8'
-        with open(full_path, 'w', encoding=encoding) as f:
-            f.write(report_content)
+    encoding = 'utf-8'
+    with open(full_path, 'w', encoding=encoding) as f:
+        f.write(report_content)
 
     return full_path
 
