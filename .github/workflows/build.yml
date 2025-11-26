@@ -1,0 +1,33 @@
+name: Build Python executable on Windows
+
+on:
+  push:
+    branches:
+      - build
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.8'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+        pip install -r requirements.txt
+
+    - name: Build executable
+      run: pyinstaller --onefile accessibility-checker/main.py
+
+    - name: Upload executable
+      uses: actions/upload-artifact@v3
+      with:
+        name: python-executable
+        path: dist\accessibility-checker.exe
