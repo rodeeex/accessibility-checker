@@ -27,7 +27,7 @@ jobs:
       run: pyinstaller --onefile accessibility-checker/main.py
 
     - name: Upload executable
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: python-executable
         path: dist\accessibility-checker.exe
