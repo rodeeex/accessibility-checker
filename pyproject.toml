@@ -1,0 +1,21 @@
+[project]
+name = "accessibility-checker"
+version = "0.1.0"
+authors = [
+    { name = "Anton Pushkarev" },
+    { name = "Bogdan Nekrasov" },
+    { name = "Anatoly Yul'yakshin" }
+]
+requires-python = ">=3.12,<3.13"
+readme = "README.md"
+
+dependencies = [
+    "playwright==1.42.0",
+    "beautifulsoup4==4.12.3",
+    "playwright-stealth",
+    "lxml==5.2.1",
+    "requests==2.31.0",
+    "colorama==0.4.6",
+    "jinja2==3.1.2",
+    "aiohttp>=3.9.0",
+]

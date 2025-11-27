@@ -1,0 +1,59 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install uv
+        run: pip install -U uv
+
+      - name: Verify structure before uv sync
+        run: |
+          echo "=== DEBUG INFO ==="
+          Get-Location
+          Test-Path pyproject.toml
+          if (Test-Path pyproject.toml) {
+            Get-Content pyproject.toml | Select-Object -First 5
+          } else {
+            Write-Error "FILE NOT FOUND"; exit 1
+          }
+
+      - name: Install dependencies from pyproject.toml
+        run: uv sync --project .
+
+      - name: Install PyInstaller
+        run: uv pip install pyinstaller playwright
+
+      - name: Install Chromium browser
+        run: uv run playwright install chromium
+
+      - name: Build EXE with spec
+        shell: pwsh
+        run: |
+          uv pip install playwright-stealth
+          uv run pyinstaller accessibility-checker.spec
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/accessibility-checker.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
