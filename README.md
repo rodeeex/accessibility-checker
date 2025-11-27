@@ -15,10 +15,10 @@ CLI-утилита для быстрой проверки веб-страниц 
 .\accessibility-checker.exe https://example.com
 
 # Сохранить HTML-отчёт
-.\accessibility-checker.exe https://example.com --report html --output report.html
+.\accessibility-checker.exe https://example.com --report html --filename report.html
 
-# Сохранить JSON
-.\accessibility-checker.exe https://example.com --report json --output report.json
+# Сохранить JSON-отчёт
+.\accessibility-checker.exe https://example.com --report json --filename report.json
 ```
 
 | Флаг         | Краткая форма | Тип                           | По умолчанию          | Описание                                                         |
