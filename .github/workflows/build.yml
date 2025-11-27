@@ -43,51 +43,11 @@ jobs:
       - name: Install Chromium browser
         run: uv run playwright install chromium
 
-      - name: Get Playwright browser path and version
-        id: browser-info
+      - name: Build EXE with spec
         shell: pwsh
         run: |
-          $path = uv run python -c "from playwright.sync_api import sync_playwright; p = sync_playwright().start(); print(p.chromium.executable_path); p.stop()"
-          if (-not $path) {
-            Write-Error "Failed to get browser path"
-            exit 1
-          }
-          $path = $path.Trim()
-          Write-Host "Browser executable: $path"
-
-          $parentDir = Split-Path $path -Parent
-          $baseDir = Split-Path $parentDir -Parent
-          $ver = Split-Path $baseDir -Leaf
-          Write-Host "Browser base dir: $baseDir"
-          Write-Host "Browser version dir: $ver"
-
-          echo "browser_dir=$baseDir" >> $env:GITHUB_OUTPUT
-          echo "browser_version=$ver" >> $env:GITHUB_OUTPUT
-
-      - name: Build EXE with bundled Chromium
-        shell: pwsh
-        run: |
-          $browserDir = "${{ steps.browser-info.outputs.browser_dir }}"
-          $browserVer = "${{ steps.browser-info.outputs.browser_version }}"
-          $browserData = "${browserDir}`;playwright/.local-browsers/${browserVer}"
-          $stealthData = "${stealthJsPath}`;playwright_stealth/js"
-
-          # Получаем путь к playwright_stealth/js
-          $stealthJsPath = uv run python -c "import playwright_stealth; import os; print(os.path.join(os.path.dirname(playwright_stealth.__file__), 'js'))"
-
-          uv run pyinstaller --onefile `
-            --name accessibility-checker `
-            --add-data="$browserData" `
-            --add-data="$stealthData" `
-            --hidden-import=playwright `
-            --hidden-import=playwright.sync_api `
-            --hidden-import=bs4 `
-            --hidden-import=lxml `
-            --hidden-import=weasyprint `
-            --hidden-import=colorama `
-            --hidden-import=playwright_stealth `
-            --collect-all playwright `
-            main.py
+          uv pip install playwright-stealth
+          uv run pyinstaller accessibility-checker.spec
 
       - name: Create Release
         uses: softprops/action-gh-release@v2
