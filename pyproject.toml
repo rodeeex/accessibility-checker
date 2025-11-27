@@ -1,5 +1,5 @@
 [project]
-name = "Accessibility Checker"
+name = "accessibility-checker"
 version = "0.1.0"
 authors = [
     { name = "Anton Pushkarev" },
