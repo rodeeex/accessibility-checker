@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from urllib.parse import urlparse
 from datetime import datetime
 from typing import Optional
@@ -6,8 +7,8 @@ from .report import make_report
 
 
 def save_report_to_file(issues, url: str, report_type: str,
-                       output_path: Optional[str] = None,
-                       filename: Optional[str] = None) -> str:
+                        output_path: Optional[str] = None,
+                        filename: Optional[str] = None) -> str:
     """
     Генерирует и сохраняет отчет в файл
 
@@ -22,26 +23,28 @@ def save_report_to_file(issues, url: str, report_type: str,
         raise ValueError("Сохранение поддерживается только для форматов: json, html")
 
     if output_path is None:
-        output_path = os.getcwd()
+        output_path = get_reports_directory()
+    else:
+        output_path = str(output_path)
 
     os.makedirs(output_path, exist_ok=True)
 
-    if filename is None:
+    if filename:
+        filename = Path(filename).name
+        full_path = os.path.join(output_path, filename)
+    else:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         domain = _extract_domain(url)
-        filename = f"accessibility_report_{domain}_{timestamp}.{report_type}"
-
-    full_path = os.path.join(output_path, filename)
-
+        ext = report_type
+        filename = f"accessibility_report_{domain}_{timestamp}.{ext}"
+        full_path = os.path.join(output_path, filename)
 
     report_content = make_report(issues, url, report_type)
 
-    encoding = 'utf-8'
-    with open(full_path, 'w', encoding=encoding) as f:
+    with open(full_path, 'w', encoding='utf-8') as f:
         f.write(report_content)
 
     return full_path
-
 
 
 def _extract_domain(url: str) -> str:

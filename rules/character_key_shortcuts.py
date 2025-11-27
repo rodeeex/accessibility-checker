@@ -10,7 +10,6 @@ class CharacterKeyShortcutsRule(WCAGRule):
     def _has_single_character_shortcut(self, script: str) -> bool:
         """
         Упрощённая проверка одиночных символов в обработчиках
-        В реальном инструменте нужен JS-парсер
         """
         script_lower = script.lower()
 
