@@ -30,11 +30,11 @@ def parse_arguments():
         description='Чекер доступности веб-сайтов',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
-        Примеры использования:
-          python main.py https://example.com
-          python main.py https://example.com --report json --timeout 30
-          python main.py https://example.com --report json --filename report.json
-          python main.py https://example.com --report html --filename accessibility_report.html
+Примеры использования:
+python main.py https://example.com
+python main.py https://example.com --report json --timeout 30
+python main.py https://example.com --report json --filename report.json
+python main.py https://example.com --report html --filename accessibility_report.html
         '''
     )
 
@@ -44,25 +44,26 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '--report',
+        '-r', '--report',
         choices=['json', 'html', 'console'],
         default='console',
-        help='Формат вывода отчета (по умолчанию: console)'
+        help='Формат вывода отчёта (по умолчанию: console)'
     )
 
     parser.add_argument(
-        '--timeout',
+        '-t', '--timeout',
         type=int,
         default=30,
         metavar='N',
-        help='Таймаут в секундах (по умолчанию: 30)'
+        help='Таймаут загрузки в секундах (по умолчанию: 30)'
     )
 
     parser.add_argument(
-        '--filename',
+        '-f', '--filename',
+        dest='filename',
         type=str,
         metavar='FILE',
-        help='Имя файла для сохранения отчета (используется с форматами json, html)'
+        help='Файл для сохранения отчёта (для json/html)'
     )
 
     return parser.parse_args()
@@ -92,7 +93,6 @@ def main():
         try:
             page_data = fetch_page(args.url, args.timeout)
             print(f"✓ Загружено: {page_data['title']} ({page_data['status']})")
-            print(f"DEBUG\n\n{page_data['html']}\n")
         except Exception as e:
             print(f"✗ Ошибка загрузки: {e}", file=sys.stderr)
             sys.exit(1)
