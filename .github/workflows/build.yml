@@ -1,39 +1,79 @@
-name: Build Python executable on Windows
+name: Build and Release
 
 on:
   push:
-    branches:
-      - build
+    tags:
+      - 'v*'
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.8'
+      - name: Setup Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install pyinstaller
-        pip install playwright
-        pip install playwright-stealth
-        playwright install
-        
-    - name: Build executable
-      run: pyinstaller --onefile --hidden-import=playwright.main --hidden-import=playwright_stealth main.py
+      - name: Install uv
+        run: pip install -U uv
 
-    - name: Show dist folder contents
-      run: dir dist
+      - name: Verify structure before uv sync
+        run: |
+          echo "=== DEBUG INFO ==="
+          Get-Location
+          Test-Path pyproject.toml
+          if (Test-Path pyproject.toml) {
+            Get-Content pyproject.toml | Select-Object -First 5
+          } else {
+            Write-Error "FILE NOT FOUND"; exit 1
+          }
 
-    - name: Upload executable artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: python-executable
-        path: dist\main.exe
+      - name: Install dependencies from pyproject.toml
+        run: uv sync --project .
+
+      - name: Install PyInstaller
+        run: uv pip install pyinstaller
+
+      - name: Install Playwright Chromium
+        run: uv run playwright install chromium
+
+      - name: Get Playwright browsers location
+        id: playwright-path
+        run: |
+          $PLAYWRIGHT_BROWSERS_PATH = uv run python -c "import os; from playwright.driver import compute_driver_executable; print(os.path.dirname(compute_driver_executable()))"
+          echo "path=$PLAYWRIGHT_BROWSERS_PATH" >> $env:GITHUB_OUTPUT
+
+      - name: Build executable with bundled Chromium
+        run: |
+          uv run pyinstaller --onefile `
+            --name accessibility-checker `
+            --hidden-import=playwright `
+            --hidden-import=playwright.sync_api `
+            --hidden-import=playwright._impl `
+            --hidden-import=bs4 `
+            --hidden-import=lxml `
+            --hidden-import=weasyprint `
+            --hidden-import=colorama `
+            --collect-all playwright `
+            --add-data "rules;rules" `
+            --add-data "browser;browser" `
+            --add-binary "${{ steps.playwright-path.outputs.path }};playwright/driver" `
+            main.py
+
+      - name: Test executable
+        run: dist\accessibility-checker.exe --help
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/accessibility-checker.exe
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
